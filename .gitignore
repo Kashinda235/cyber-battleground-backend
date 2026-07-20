@@ -141,5 +141,4 @@ vite.config.ts.timestamp-*
 .vite/
 
 # Local files
-package-lock.json
 .idea
