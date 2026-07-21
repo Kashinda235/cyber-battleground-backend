@@ -21,7 +21,7 @@ export const gameController = {
   async getMoves(req: Request, res: Response, next: NextFunction) {
     try {
       const playerId = req.query.player_id ? Number(req.query.player_id) : undefined;
-      const limit = Number(req.query.limit ?? 50);
+      const limit = Number(req.query.limit ?? 20);
       const result = await gameService.getMoveLogs(playerId, limit);
       res.json(result);
     } catch (error) {

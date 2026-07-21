@@ -65,7 +65,7 @@ export const gameService = {
     });
   },
 
-  async getMoveLogs(playerId?: number, limit = 50) {
+  async getMoveLogs(playerId?: number, limit = 20) {
     const query = db.select().from(moveLogs)
       .orderBy(desc(moveLogs.timestamp));
 
