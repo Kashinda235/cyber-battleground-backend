@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { gameService } from '../services/gameService.js';
 import { AuthenticatedRequest } from '../middleware/auth.js';
-import { actionSchema, chatSchema, stateSchema } from '../validation/gameValidation.js'
+import { actionSchema, chatSchema, sessionIdParamSchema, stateSchema } from '../validation/gameValidation.js';
 
 export const gameController = {
   async createAction(req: AuthenticatedRequest, res: Response, next: NextFunction) {
@@ -79,7 +79,8 @@ export const gameController = {
 
   async joinSession(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
-      const result = await gameService.joinSession(req.params.id, req.user!.playerId);
+      const { id } = sessionIdParamSchema.parse(req.params);
+      const result = await gameService.joinSession(id, req.user!.playerId);
       res.json(result);
     } catch (error) {
       next(error);
@@ -88,7 +89,8 @@ export const gameController = {
 
   async getSession(req: Request, res: Response, next: NextFunction) {
     try {
-      const result = await gameService.getSession(req.params.id);
+      const { id } = sessionIdParamSchema.parse(req.params);
+      const result = await gameService.getSession(id);
       res.json(result);
     } catch (error) {
       next(error);
@@ -97,7 +99,8 @@ export const gameController = {
 
   async getSessionPlayers(req: Request, res: Response, next: NextFunction) {
     try {
-      const result = await gameService.getSessionPlayers(req.params.id);
+      const { id } = sessionIdParamSchema.parse(req.params);
+      const result = await gameService.getSessionPlayers(id);
       res.json(result);
     } catch (error) {
       next(error);

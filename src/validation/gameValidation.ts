@@ -14,3 +14,7 @@ export const stateSchema = z.object({
     gameStatus: z.string().optional(),
     turn: z.number().optional(),
 }).passthrough();
+
+export const sessionIdParamSchema = z.object({
+    id: z.string().trim().min(1, 'Session ID is required'),
+});
