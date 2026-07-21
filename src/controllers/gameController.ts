@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { gameService } from '../services/gameService.js';
 import { AuthenticatedRequest } from '../middleware/auth.js';
-import { actionSchema, chatSchema, sessionIdParamSchema, stateSchema } from '../validation/gameValidation.js';
+import { actionSchema, chatSchema, sessionIdParamSchema, stateSchema, getMovesQuerySchema, getChatQuerySchema } from '../validation/gameValidation.js';
 
 export const gameController = {
   async createAction(req: AuthenticatedRequest, res: Response, next: NextFunction) {
@@ -20,9 +20,8 @@ export const gameController = {
 
   async getMoves(req: Request, res: Response, next: NextFunction) {
     try {
-      const playerId = req.query.player_id ? Number(req.query.player_id) : undefined;
-      const limit = Number(req.query.limit ?? 20);
-      const result = await gameService.getMoveLogs(playerId, limit);
+      const parsed = getMovesQuerySchema.parse(req.query);
+      const result = await gameService.getMoveLogs(parsed.player_id, parsed.limit);
       res.json(result);
     } catch (error) {
       next(error);
@@ -60,8 +59,8 @@ export const gameController = {
 
   async getChat(req: Request, res: Response, next: NextFunction) {
     try {
-      const limit = Number(req.query.limit ?? 50);
-      const result = await gameService.getChat(limit);
+      const parsed = getChatQuerySchema.parse(req.query);
+      const result = await gameService.getChat(parsed.limit);
       res.json(result);
     } catch (error) {
       next(error);

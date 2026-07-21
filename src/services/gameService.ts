@@ -59,7 +59,7 @@ export const gameService = {
         success: true,
         action: input.actionType,
         damage,
-        cooldownRemaining: 0,
+        cooldownRemaining: cooldownUntil.getTime() - now.getTime(),
         moveLog: move,
       };
     });

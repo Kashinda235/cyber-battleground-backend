@@ -43,17 +43,16 @@ export const playerService = {
       throw new AppError('Ability not found', 404);
     }
 
-    const [existing] = await db.select().from(playerAbilities).where(and(eq(playerAbilities.playerId, playerId), eq(playerAbilities.abilityId, abilityId))).limit(1);
-    if (existing) {
-      throw new AppError('Ability already assigned', 409);
-    }
-
     const cooldownUntil = new Date(Date.now() + 60_000);
     const [assigned] = await db.insert(playerAbilities).values({
       playerId,
       abilityId,
       cooldownUntil,
-    }).returning();
+    }).onConflictDoNothing().returning();
+
+    if (!assigned) {
+      throw new AppError('Ability already assigned', 409);
+    }
 
     return assigned;
   },
