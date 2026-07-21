@@ -24,6 +24,17 @@ export const playerService = {
     return db.select().from(abilities);
   },
 
+  async createAbility(input: { name: string; description: string; type: string; stats: Record<string, unknown> }) {
+    const [ability] = await db.insert(abilities).values({
+      name: input.name,
+      description: input.description,
+      type: input.type,
+      stats: input.stats,
+    }).returning();
+
+    return ability;
+  },
+
   async getAbilityById(id: number) {
     const [ability] = await db.select().from(abilities).where(eq(abilities.id, id)).limit(1);
     if (!ability) {

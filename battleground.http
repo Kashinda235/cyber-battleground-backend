@@ -1,4 +1,69 @@
 ### GET request to example server
 GET http://localhost:8000/players
 
-###
+### Register a player
+POST http://localhost:8000/auth/register
+Content-Type: application/json
+
+{
+    "username":"Krishna",
+    "role":"admin"
+}
+
+### Login
+POST http://localhost:8000/auth/login
+Content-Type: application/json
+
+{
+  "username": "Krishna"
+}
+
+### Use the returned token to call protected routes
+GET  http://localhost:8000/players/me
+Authorization: Bearer YOUR_TOKEN_HERE
+
+### Trial
+GET  http://localhost:8000/players/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwbGF5ZXJJZCI6MywidXNlcm5hbWUiOiJLYXNoaW5kYSIsInJvbGUiOiJibHVlIiwiaWF0IjoxNzg0NjQ4MjA3fQ.dKGizCPAJOlarU6sKogkx1kqdlDcAOAFd7V6e_kBxVw
+
+### Create ability
+POST http://localhost:8000/abilities
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwbGF5ZXJJZCI6NCwidXNlcm5hbWUiOiJLcmlzaG5hIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzg0NjUzNzk2fQ.MEvYXZM0Sm9RaMaJg-n3x4S39dnJpbgkvk6YUQ9d2eY
+Content-Type: application/json
+
+{
+    "name": "Specialist",
+    "description": "Launch any attack with excellence",
+    "type": "attack",
+    "stats": {
+                "power": 15
+    }
+}
+
+### Assign Ability
+### http://localhost:8000/players/:id/abilities
+POST http://localhost:8000/players/3/abilities
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwbGF5ZXJJZCI6MywidXNlcm5hbWUiOiJLYXNoaW5kYSIsInJvbGUiOiJibHVlIiwiaWF0IjoxNzg0NjQ4MjA3fQ.dKGizCPAJOlarU6sKogkx1kqdlDcAOAFd7V6e_kBxVw
+Content-Type: application/json
+
+{
+    "ability_id":1
+}
+
+### Example action
+POST http://localhost:8000/actions
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwbGF5ZXJJZCI6MywidXNlcm5hbWUiOiJLYXNoaW5kYSIsInJvbGUiOiJibHVlIiwiaWF0IjoxNzg0NjQ4MjA3fQ.dKGizCPAJOlarU6sKogkx1kqdlDcAOAFd7V6e_kBxVw
+Content-Type: application/json
+
+{
+  "action_type":"attack",
+  "target_id":2,
+  "ability_id":1
+}
+
+### Getting player abilities
+GET http://localhost:8000/abilities
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwbGF5ZXJJZCI6MywidXNlcm5hbWUiOiJLYXNoaW5kYSIsInJvbGUiOiJibHVlIiwiaWF0IjoxNzg0NjQ4MjA3fQ.dKGizCPAJOlarU6sKogkx1kqdlDcAOAFd7V6e_kBxVw
+
+### Getting moves
+GET http://localhost:8000/moves

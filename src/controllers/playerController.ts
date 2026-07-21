@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { statusSchema, assignAbilitySchema } from '../validation/playerValidation.js';
+import { statusSchema, assignAbilitySchema, createAbilitySchema } from '../validation/playerValidation.js';
 import { playerService } from '../services/playerService.js';
 import { AuthenticatedRequest } from '../middleware/auth.js';
 
@@ -27,6 +27,16 @@ export const playerController = {
     try {
       const result = await playerService.listAbilities();
       res.json(result);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async createAbility(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+    try {
+      const data = createAbilitySchema.parse(req.body);
+      const result = await playerService.createAbility(data);
+      res.status(201).json(result);
     } catch (error) {
       next(error);
     }

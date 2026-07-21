@@ -9,6 +9,7 @@ gameRoutes.get('/players/me', authMiddleware, playerController.me);
 gameRoutes.patch('/players/status', authMiddleware, playerController.updateStatus);
 
 gameRoutes.get('/abilities', playerController.listAbilities);
+gameRoutes.post('/abilities', authMiddleware, adminMiddleware, playerController.createAbility);
 gameRoutes.get('/abilities/:id', playerController.getAbilityById);
 gameRoutes.post('/players/:id/abilities', authMiddleware, playerController.assignAbility);
 gameRoutes.get('/players/:id/abilities', authMiddleware, playerController.getPlayerAbilities);
