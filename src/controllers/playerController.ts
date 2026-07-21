@@ -1,15 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
-import { z } from 'zod';
+import { statusSchema, assignAbilitySchema } from '../validation/playerValidation.js';
 import { playerService } from '../services/playerService.js';
 import { AuthenticatedRequest } from '../middleware/auth.js';
-
-const statusSchema = z.object({
-  status: z.enum(['online', 'offline', 'banned']),
-});
-
-const assignAbilitySchema = z.object({
-  ability_id: z.number().int().positive(),
-});
 
 export const playerController = {
   async me(req: AuthenticatedRequest, res: Response, next: NextFunction) {

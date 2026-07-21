@@ -1,22 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
-import { z } from 'zod';
 import { gameService } from '../services/gameService.js';
 import { AuthenticatedRequest } from '../middleware/auth.js';
-
-const actionSchema = z.object({
-  action_type: z.string().min(1),
-  target_id: z.number().int().positive(),
-  ability_id: z.number().int().positive(),
-});
-
-const chatSchema = z.object({
-  message: z.string().min(1),
-});
-
-const stateSchema = z.object({
-  gameStatus: z.string().optional(),
-  turn: z.number().optional(),
-}).passthrough();
+import { actionSchema, chatSchema, stateSchema } from '../validation/gameValidation.js'
 
 export const gameController = {
   async createAction(req: AuthenticatedRequest, res: Response, next: NextFunction) {
