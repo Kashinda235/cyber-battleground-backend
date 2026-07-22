@@ -15,7 +15,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/auth', authRoutes);
-app.use('/game', gameRoutes);
+app.use('/', gameRoutes);
 
 app.use(notFoundHandler);
 app.use(errorHandler);
