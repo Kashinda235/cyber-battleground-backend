@@ -10,9 +10,12 @@ app.use(express.json());
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok' });
 });
+app.get('/', (req, res) => {
+  res.send('Hello from Game server!');
+});
 
 app.use('/auth', authRoutes);
-app.use('/', gameRoutes);
+app.use('/game', gameRoutes);
 
 app.use(notFoundHandler);
 app.use(errorHandler);
