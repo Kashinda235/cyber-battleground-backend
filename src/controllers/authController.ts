@@ -17,9 +17,6 @@ export const authController = {
     try {
       const data = loginSchema.parse(req.body);
       const result = await authService.login(data.username);
-      if(res.app.locals.broadcastPlayerJoined) {
-        res.app.locals.broadcastPlayerJoined(result.player);
-      }
       res.json(result);
     } catch (error) {
       next(error);
