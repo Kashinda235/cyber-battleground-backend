@@ -501,32 +501,51 @@ paths:
       tags:
         - Game Actions
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ActionRequest'
+              $ref: '`#/components/schemas/ActionRequest`'
       responses:
         '201':
           description: Action performed successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ActionResult'
+                $ref: '`#/components/schemas/ActionResult`'
         '404':
           description: Player, target, or ability not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '`#/components/schemas/ErrorResponse`'
         '409':
           description: Ability on cooldown
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '`#/components/schemas/ErrorResponse`'
+    delete:
+      summary: Delete all move logs
+      tags:
+        - Game Actions
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: Move logs deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '`#/components/schemas/DeleteResult`'
+        '403':
+          description: Admin only
+          content:
+            application/json:
+              schema:
+                $ref: '`#/components/schemas/ErrorResponse`'
   /moves:
     get:
       summary: Retrieve move logs

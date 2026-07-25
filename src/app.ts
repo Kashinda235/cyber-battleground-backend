@@ -8,9 +8,11 @@ export const app = express();
 
 app.use(express.json());
 
-app.use(cors({
-  origin: process.env.FRONTEND_URL
-}));
+const allowedOrigin = process.env.FRONTEND_URL;
+if (!allowedOrigin) {
+    throw new Error('FRONTEND_URL must be set to configure CORS');
+}
+app.use(cors({ origin: allowedOrigin }));
 
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok' });
