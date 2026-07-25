@@ -114,6 +114,28 @@ export const gameService = {
     return db.select().from(chatLogs).orderBy(desc(chatLogs.timestamp)).limit(limit);
   },
 
+  async deleteMoveLogs() {
+    await db.delete(moveLogs);
+    return { success: true, message: 'Move logs deleted' };
+  },
+
+  async deleteChatLogs() {
+    await db.delete(chatLogs);
+    return { success: true, message: 'Chat logs deleted' };
+  },
+
+  async resetGame() {
+    return db.transaction(async (tx) => {
+      await tx.delete(playerAbilities);
+      await tx.delete(moveLogs);
+      await tx.delete(chatLogs);
+      await tx.delete(globalState);
+      await tx.delete(abilities);
+      await tx.delete(players);
+      return { success: true, message: 'Game reset complete' };
+    });
+  },
+
   async createSession(hostId: number) {
     const [host] = await db.select().from(players).where(eq(players.id, hostId)).limit(1);
     if (!host) {

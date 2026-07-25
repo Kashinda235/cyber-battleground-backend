@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { gameService } from '../services/gameService.js';
 import { AuthenticatedRequest } from '../middleware/auth.js';
 import { actionSchema, chatSchema, sessionIdParamSchema, stateSchema, getMovesQuerySchema, getChatQuerySchema } from '../validation/gameValidation.js';
+import {app} from "../app.js";
 
 export const gameController = {
   async createAction(req: AuthenticatedRequest, res: Response, next: NextFunction) {
@@ -12,6 +13,9 @@ export const gameController = {
         targetId: data.target_id,
         abilityId: data.ability_id,
       });
+      if(app.locals.broadcastPerformedAction) {
+        app.locals.broadcastPerformedAction(result.moveLog);
+      }
       res.status(201).json(result);
     } catch (error) {
       next(error);
@@ -41,6 +45,9 @@ export const gameController = {
     try {
       const data = stateSchema.parse(req.body);
       const result = await gameService.updateState(data);
+      if (app.locals.broadcastGameState) {
+        app.locals.broadcastGameState(result);
+      }
       res.json(result);
     } catch (error) {
       next(error);
@@ -51,6 +58,9 @@ export const gameController = {
     try {
       const data = chatSchema.parse(req.body);
       const result = await gameService.postChat(req.user!.playerId, data.message);
+      if (app.locals.broadcastMessage) {
+        app.locals.broadcastMessage(result);
+      }
       res.status(201).json(result);
     } catch (error) {
       next(error);
@@ -61,6 +71,33 @@ export const gameController = {
     try {
       const parsed = getChatQuerySchema.parse(req.query);
       const result = await gameService.getChat(parsed.limit);
+      res.json(result);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async deleteMoveLogs(_req: Request, res: Response, next: NextFunction) {
+    try {
+      const result = await gameService.deleteMoveLogs();
+      res.json(result);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async deleteChatLogs(_req: Request, res: Response, next: NextFunction) {
+    try {
+      const result = await gameService.deleteChatLogs();
+      res.json(result);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async resetGame(_req: Request, res: Response, next: NextFunction) {
+    try {
+      const result = await gameService.resetGame();
       res.json(result);
     } catch (error) {
       next(error);

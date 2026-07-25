@@ -1,0 +1,1052 @@
+openapi: 3.0.3
+info:
+  title: Cyber Battleground API
+  version: 1.0.0
+  description: >-
+    OpenAPI 3.0 documentation for the cyber battleground backend.
+    The service runs on port 8000 and exposes authentication, player,
+    ability, game-state, chat, action, and session endpoints.
+servers:
+  - url: http://localhost:8000
+    description: Local development server
+paths:
+  /health:
+    get:
+      summary: Health check
+      tags:
+        - Health
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+  /:
+    get:
+      summary: Root endpoint
+      tags:
+        - Health
+      responses:
+        '200':
+          description: Welcome message
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Hello from Game server!
+  /auth/register:
+    post:
+      summary: Register a new player
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: Player created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '409':
+          description: Player already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /auth/login:
+    post:
+      summary: Log in an existing player
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Authentication successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '404':
+          description: Player not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /players/me:
+    get:
+      summary: Get the authenticated player's profile
+      tags:
+        - Players
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Player profile returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Player'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /players/status:
+    patch:
+      summary: Update the authenticated player's status
+      tags:
+        - Players
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StatusUpdateRequest'
+      responses:
+        '200':
+          description: Player status updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Player'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /players:
+    get:
+      summary: List all players
+      tags:
+        - Players
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Player list returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Player'
+    delete:
+      summary: Delete all players
+      tags:
+        - Players
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Players deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteResult'
+        '403':
+          description: Admin only
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /players/{id}:
+    delete:
+      summary: Delete a player by ID
+      tags:
+        - Players
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Player ID
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Player deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteResult'
+        '403':
+          description: Admin only
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Player not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /players/{id}/abilities:
+    post:
+      summary: Assign an ability to a player
+      tags:
+        - Players
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Player ID
+          schema:
+            type: integer
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssignAbilityRequest'
+      responses:
+        '201':
+          description: Ability assigned successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlayerAbility'
+        '404':
+          description: Player or ability not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Ability already assigned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    get:
+      summary: List abilities assigned to a player
+      tags:
+        - Players
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Player ID
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Assigned abilities returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PlayerAbility'
+    delete:
+      summary: Remove all abilities from a player
+      tags:
+        - Players
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Player ID
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Player abilities deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteResult'
+        '403':
+          description: Admin only
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Player not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /players/{playerId}/abilities/{abilityId}:
+    delete:
+      summary: Remove a specific ability from a player
+      tags:
+        - Players
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: playerId
+          in: path
+          required: true
+          description: Player ID
+          schema:
+            type: integer
+            minimum: 1
+        - name: abilityId
+          in: path
+          required: true
+          description: Ability ID
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Player ability deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteResult'
+        '403':
+          description: Admin only
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Player ability not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /abilities:
+    get:
+      summary: List all abilities
+      tags:
+        - Abilities
+      responses:
+        '200':
+          description: Ability list returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Ability'
+    post:
+      summary: Create a new ability
+      tags:
+        - Abilities
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAbilityRequest'
+      responses:
+        '201':
+          description: Ability created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ability'
+        '403':
+          description: Admin only
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      summary: Delete all abilities
+      tags:
+        - Abilities
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Abilities deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteResult'
+        '403':
+          description: Admin only
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /abilities/{id}:
+    get:
+      summary: Get an ability by ID
+      tags:
+        - Abilities
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Ability ID
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Ability returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ability'
+        '404':
+          description: Ability not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    patch:
+      summary: Update an ability by ID
+      tags:
+        - Abilities
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Ability ID
+          schema:
+            type: integer
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAbilityRequest'
+      responses:
+        '200':
+          description: Ability updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ability'
+        '403':
+          description: Admin only
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Ability not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      summary: Delete an ability by ID
+      tags:
+        - Abilities
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Ability ID
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Ability deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteResult'
+        '403':
+          description: Admin only
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Ability not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /actions:
+    post:
+      summary: Perform a player action
+      tags:
+        - Game Actions
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActionRequest'
+      responses:
+        '201':
+          description: Action performed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActionResult'
+        '404':
+          description: Player, target, or ability not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Ability on cooldown
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /moves:
+    get:
+      summary: Retrieve move logs
+      tags:
+        - Game Actions
+      parameters:
+        - name: player_id
+          in: query
+          description: Filter move logs by a specific player ID
+          schema:
+            type: integer
+            minimum: 1
+        - name: limit
+          in: query
+          description: Maximum number of logs to return
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        '200':
+          description: Move logs returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MoveLog'
+  /state:
+    get:
+      summary: Retrieve the current game state
+      tags:
+        - Game State
+      responses:
+        '200':
+          description: Game state returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GameState'
+    patch:
+      summary: Update the current game state
+      tags:
+        - Game State
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StateUpdateRequest'
+      responses:
+        '200':
+          description: Game state updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GameState'
+        '403':
+          description: Admin only
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /chat:
+    post:
+      summary: Post a chat message
+      tags:
+        - Chat
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatRequest'
+      responses:
+        '201':
+          description: Chat message posted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatLog'
+        '404':
+          description: Player not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    get:
+      summary: Retrieve chat logs
+      tags:
+        - Chat
+      parameters:
+        - name: limit
+          in: query
+          description: Maximum number of chat entries to return
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 50
+      responses:
+        '200':
+          description: Chat logs returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ChatLog'
+    delete:
+      summary: Delete all chat logs
+      tags:
+        - Chat
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Chat logs deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteResult'
+        '403':
+          description: Admin only
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /admin/reset-game:
+    post:
+      summary: Reset the game state and related data
+      tags:
+        - Administration
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Game reset successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteResult'
+        '403':
+          description: Admin only
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /sessions:
+    post:
+      summary: Create a session
+      tags:
+        - Sessions
+      security:
+        - bearerAuth: []
+      responses:
+        '201':
+          description: Session created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionResponse'
+        '404':
+          description: Player not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /sessions/{id}/join:
+    post:
+      summary: Join a session
+      tags:
+        - Sessions
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Session ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Player joined the session
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionJoinResponse'
+        '404':
+          description: Player not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /sessions/{id}:
+    get:
+      summary: Get a session by ID
+      tags:
+        - Sessions
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Session ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Session details returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionResponse'
+  /sessions/{id}/players:
+    get:
+      summary: Get players for a session
+      tags:
+        - Sessions
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Session ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Session players returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionResponse'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Player:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        username:
+          type: string
+          example: player-one
+        role:
+          type: string
+          enum: [admin, moderator, red, blue, spectator, bot]
+          example: spectator
+        status:
+          type: string
+          enum: [online, offline, banned]
+          example: online
+        joinedAt:
+          type: string
+          format: date-time
+        lastSeen:
+          type: string
+          format: date-time
+    Ability:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Hack
+        description:
+          type: string
+          example: A powerful offensive ability.
+        type:
+          type: string
+          example: offensive
+        stats:
+          type: object
+          additionalProperties: true
+          example:
+            power: 20
+            range: 2
+    PlayerAbility:
+      type: object
+      properties:
+        playerId:
+          type: integer
+          example: 1
+        abilityId:
+          type: integer
+          example: 2
+        cooldownUntil:
+          type: string
+          format: date-time
+    MoveLog:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 10
+        playerId:
+          type: integer
+          example: 1
+        targetId:
+          type: integer
+          example: 2
+        action:
+          type: string
+          example: attack
+        metadata:
+          type: object
+          additionalProperties: true
+        timestamp:
+          type: string
+          format: date-time
+    ChatLog:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 3
+        senderId:
+          type: integer
+          example: 1
+        message:
+          type: string
+          example: Hello world
+        timestamp:
+          type: string
+          format: date-time
+        metadata:
+          type: object
+          additionalProperties: true
+        tags:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+          format: date-time
+    AuthResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        player:
+          $ref: '#/components/schemas/Player'
+    RegisterRequest:
+      type: object
+      required: [username]
+      properties:
+        username:
+          type: string
+          minLength: 1
+          example: player-one
+        role:
+          type: string
+          example: spectator
+    LoginRequest:
+      type: object
+      required: [username]
+      properties:
+        username:
+          type: string
+          minLength: 1
+          example: player-one
+    StatusUpdateRequest:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [online, offline, banned]
+          example: online
+    AssignAbilityRequest:
+      type: object
+      required: [ability_id]
+      properties:
+        ability_id:
+          type: integer
+          minimum: 1
+          example: 2
+    CreateAbilityRequest:
+      type: object
+      required: [name, description, type]
+      properties:
+        name:
+          type: string
+          example: Hack
+        description:
+          type: string
+          example: Offensive ability
+        type:
+          type: string
+          example: offensive
+        stats:
+          type: object
+          additionalProperties: true
+          example:
+            power: 20
+    UpdateAbilityRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Hack
+        description:
+          type: string
+          example: Offensive ability
+        type:
+          type: string
+          example: offensive
+        stats:
+          type: object
+          additionalProperties: true
+    ActionRequest:
+      type: object
+      required: [action_type, target_id, ability_id]
+      properties:
+        action_type:
+          type: string
+          example: attack
+        target_id:
+          type: integer
+          minimum: 1
+          example: 2
+        ability_id:
+          type: integer
+          minimum: 1
+          example: 3
+    ActionResult:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        action:
+          type: string
+          example: attack
+        damage:
+          type: integer
+          example: 30
+        cooldownRemaining:
+          type: integer
+          example: 30000
+        moveLog:
+          $ref: '#/components/schemas/MoveLog'
+    ChatRequest:
+      type: object
+      required: [message]
+      properties:
+        message:
+          type: string
+          example: Hello from the battlefield
+    GameState:
+      type: object
+      properties:
+        gameStatus:
+          type: string
+          example: ready
+        turn:
+          type: integer
+          example: 1
+      additionalProperties: true
+    StateUpdateRequest:
+      type: object
+      properties:
+        gameStatus:
+          type: string
+          example: ready
+        turn:
+          type: integer
+          example: 1
+      additionalProperties: true
+    DeleteResult:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Player deleted
+    SessionResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          example: session-1753190400000
+        hostId:
+          type: integer
+          example: 1
+        players:
+          type: array
+          items:
+            type: integer
+          example: [1]
+    SessionJoinResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          example: session-1753190400000
+        joined:
+          type: boolean
+          example: true
+        playerId:
+          type: integer
+          example: 2
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          example: Player not found
