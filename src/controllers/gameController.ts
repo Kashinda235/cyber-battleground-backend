@@ -77,6 +77,33 @@ export const gameController = {
     }
   },
 
+  async deleteMoveLogs(_req: Request, res: Response, next: NextFunction) {
+    try {
+      const result = await gameService.deleteMoveLogs();
+      res.json(result);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async deleteChatLogs(_req: Request, res: Response, next: NextFunction) {
+    try {
+      const result = await gameService.deleteChatLogs();
+      res.json(result);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async resetGame(_req: Request, res: Response, next: NextFunction) {
+    try {
+      const result = await gameService.resetGame();
+      res.json(result);
+    } catch (error) {
+      next(error);
+    }
+  },
+
   async createSession(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
       const result = await gameService.createSession(req.user!.playerId);

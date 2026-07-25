@@ -97,15 +97,15 @@ export function attachWebSocketServer(server: Server) {
     }
 
     function broadcastPerformedAction<T = unknown>(action: T): void {
-        broadcast(wss, { type: 'action_performed', data: action });
+        broadcast(wss, { type: 'action', data: action });
     }
 
     function broadcastGameState<T = unknown>(state: T): void {
-        broadcast(wss, { type: 'game_state_updated', data: state });
+        broadcast(wss, { type: 'game_state', data: state });
     }
 
     function broadcastMessage<T = unknown>(message: T): void {
-        broadcast(wss, { type: 'chat_message_recieved', data: message });
+        broadcast(wss, { type: 'chat', data: message });
     }
 
     return {
