@@ -23,7 +23,7 @@ gameRoutes.delete('/abilities/:id', authMiddleware, adminMiddleware, playerContr
 gameRoutes.get('/abilities/:id', playerController.getAbilityById);
 
 gameRoutes.post('/actions', authMiddleware, gameController.createAction);
-gameRoutes.get('/moves', gameController.getMoves);
+gameRoutes.get('/actions', gameController.getMoves);
 gameRoutes.delete('/actions', authMiddleware, adminMiddleware, gameController.deleteMoveLogs);
 
 gameRoutes.get('/state', gameController.getState);
