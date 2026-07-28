@@ -5,7 +5,7 @@ export const validate =
     (schema: ZodTypeAny) =>
         (req: Request, res: Response, next: NextFunction) => {
             try {
-                const parsed = schema.parse({
+                const parsed: any = schema.safeParse({
                     body: req.body,
                     query: req.query,
                     params: req.params,
