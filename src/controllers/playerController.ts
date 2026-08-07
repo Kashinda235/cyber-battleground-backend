@@ -1,12 +1,13 @@
 import { NextFunction, Request, Response } from 'express';
 import { statusSchema, assignAbilitySchema, createAbilitySchema, playerIdParamSchema, playerAbilityParamSchema, updateAbilitySchema } from '../validation/playerValidation.js';
 import { playerService } from '../services/playerService.js';
+import { systemService } from '../services/systemService.js';
 import { AuthenticatedRequest } from '../middleware/auth.js';
 
 export const playerController = {
   async me(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
-      const result = await playerService.getMe(req.user!.playerId);
+      const result = await systemService.getSystemForPlayer(req.user!.playerId);
       res.json(result);
     } catch (error) {
       next(error);

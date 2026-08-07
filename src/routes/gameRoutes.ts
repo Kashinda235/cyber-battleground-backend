@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { gameController } from '../controllers/gameController.js';
 import { playerController } from '../controllers/playerController.js';
+import { systemController } from '../controllers/systemController.js';
 import { authMiddleware, adminMiddleware } from '../middleware/auth.js';
 
 export const gameRoutes = Router();
@@ -21,6 +22,20 @@ gameRoutes.patch('/abilities/:id', authMiddleware, adminMiddleware, playerContro
 gameRoutes.delete('/abilities', authMiddleware, adminMiddleware, playerController.deleteAllAbilities);
 gameRoutes.delete('/abilities/:id', authMiddleware, adminMiddleware, playerController.deleteAbility);
 gameRoutes.get('/abilities/:id', playerController.getAbilityById);
+
+gameRoutes.patch('/system', authMiddleware, systemController.updateSystem);
+gameRoutes.get('/system/network', authMiddleware, systemController.getNetwork);
+gameRoutes.patch('/system/network/:id', authMiddleware, systemController.updateNetwork);
+gameRoutes.get('/system/defense', authMiddleware, systemController.getDefense);
+gameRoutes.patch('/system/defense', authMiddleware, systemController.updateDefense);
+gameRoutes.get('/system/assets', authMiddleware, systemController.listAssets);
+gameRoutes.post('/system/assets', authMiddleware, systemController.createAsset);
+gameRoutes.patch('/system/assets/:id', authMiddleware, systemController.updateAsset);
+gameRoutes.delete('/system/assets/:id', authMiddleware, systemController.deleteAsset);
+gameRoutes.get('/player/connections', authMiddleware, systemController.listConnections);
+gameRoutes.post('/player/connections', authMiddleware, systemController.createConnection);
+gameRoutes.patch('/player/connections/:id', authMiddleware, systemController.updateConnection);
+gameRoutes.delete('/player/connections/:id', authMiddleware, systemController.deleteConnection);
 
 gameRoutes.post('/actions', authMiddleware, gameController.createAction);
 gameRoutes.get('/actions', gameController.getMoves);

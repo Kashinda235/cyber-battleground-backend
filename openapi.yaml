@@ -96,11 +96,11 @@ paths:
         - bearerAuth: []
       responses:
         '200':
-          description: Player profile returned
+          description: Player profile returned with associated system configuration
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Player'
+                $ref: '#/components/schemas/PlayerSystemProfile'
         '401':
           description: Unauthorized
           content:
@@ -491,6 +491,379 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
           description: Ability not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /system:
+    patch:
+      summary: Update the authenticated player's core system properties
+      tags:
+        - System
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SystemUpdateRequest'
+      responses:
+        '200':
+          description: System updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/System'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /system/network:
+    get:
+      summary: Retrieve all network port configurations for the authenticated player
+      tags:
+        - System
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Network configurations returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/NetworkConfig'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /system/network/{id}:
+    patch:
+      summary: Update a specific network port configuration
+      tags:
+        - System
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Network configuration ID
+          schema:
+            type: integer
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NetworkUpdateRequest'
+      responses:
+        '200':
+          description: Network configuration updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NetworkConfig'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Network port not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /system/defense:
+    get:
+      summary: Retrieve defense settings for the authenticated player
+      tags:
+        - System
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Defense settings returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DefenseConfig'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    patch:
+      summary: Update defense settings for the authenticated player
+      tags:
+        - System
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DefenseUpdateRequest'
+      responses:
+        '200':
+          description: Defense settings updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DefenseConfig'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /system/assets:
+    get:
+      summary: List all assets belonging to the authenticated player's system
+      tags:
+        - System
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Assets returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Asset'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      summary: Create a new asset for the authenticated player's system
+      tags:
+        - System
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssetCreateRequest'
+      responses:
+        '201':
+          description: Asset created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Asset'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /system/assets/{id}:
+    patch:
+      summary: Update an existing asset by ID
+      tags:
+        - System
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Asset ID
+          schema:
+            type: integer
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssetUpdateRequest'
+      responses:
+        '200':
+          description: Asset updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Asset'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Asset not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      summary: Delete an asset by ID
+      tags:
+        - System
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Asset ID
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Asset deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteResult'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Asset not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /player/connections:
+    get:
+      summary: List active inbound/outbound connection entries
+      tags:
+        - Player
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Connections returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Connection'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      summary: Add a new connection entry
+      tags:
+        - Player
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConnectionCreateRequest'
+      responses:
+        '201':
+          description: Connection created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Connection'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /player/connections/{id}:
+    patch:
+      summary: Update a connection entry by ID
+      tags:
+        - Player
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Connection ID
+          schema:
+            type: integer
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConnectionUpdateRequest'
+      responses:
+        '200':
+          description: Connection updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Connection'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Connection not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      summary: Remove a connection entry by ID
+      tags:
+        - Player
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Connection ID
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Connection deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteResult'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Connection not found
           content:
             application/json:
               schema:
@@ -1028,6 +1401,125 @@ components:
           type: integer
           example: 1
       additionalProperties: true
+    PlayerSystemProfile:
+      type: object
+      properties:
+        player:
+          $ref: '#/components/schemas/Player'
+        system:
+          $ref: '#/components/schemas/System'
+        defense:
+          $ref: '#/components/schemas/DefenseConfig'
+        network:
+          type: array
+          items:
+            $ref: '#/components/schemas/NetworkConfig'
+    System:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        playerId:
+          type: integer
+          example: 1
+        ip:
+          type: string
+          example: 10.0.1.10
+        hostname:
+          type: string
+          example: player-one-machine
+        password:
+          type: string
+          example: changeme
+        mail:
+          type: string
+          example: player-one@example.com
+        createdAt:
+          type: string
+          format: date-time
+    NetworkConfig:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        systemId:
+          type: integer
+          example: 1
+        port:
+          type: integer
+          example: 22
+        status:
+          type: string
+          example: open
+        metadata:
+          type: object
+          additionalProperties: true
+    DefenseConfig:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        systemId:
+          type: integer
+          example: 1
+        firewallLevel:
+          type: integer
+          example: 1
+        idsStatus:
+          type: boolean
+          example: false
+        honeypotActive:
+          type: boolean
+          example: false
+        lockdownActive:
+          type: boolean
+          example: false
+        autoPayThreshold:
+          type: integer
+          example: 0
+    Asset:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        systemId:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: laptop
+        value:
+          type: integer
+          example: 50
+        size:
+          type: integer
+          example: 120
+        isDecoy:
+          type: boolean
+          example: false
+        isTrap:
+          type: boolean
+          example: false
+    Connection:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        systemId:
+          type: integer
+          example: 1
+        targetIp:
+          type: string
+          example: 192.168.1.5
+        status:
+          type: string
+          enum: [blocked, friend, bot]
+          example: friend
     DeleteResult:
       type: object
       properties:
@@ -1037,6 +1529,112 @@ components:
         message:
           type: string
           example: Player deleted
+    SystemUpdateRequest:
+      type: object
+      properties:
+        hostname:
+          type: string
+          example: player-one-machine
+        password:
+          type: string
+          example: changeme
+        mail:
+          type: string
+          format: email
+          example: player-one@example.com
+    NetworkUpdateRequest:
+      type: object
+      properties:
+        port:
+          type: integer
+          minimum: 1
+          example: 22
+        metadata:
+          type: object
+          additionalProperties: true
+        status:
+          type: string
+          example: open
+    DefenseUpdateRequest:
+      type: object
+      properties:
+        firewall_level:
+          type: integer
+          minimum: 0
+          example: 2
+        ids_status:
+          type: boolean
+          example: true
+        honeypot_active:
+          type: boolean
+          example: false
+        lockdown_active:
+          type: boolean
+          example: true
+        autopay_threshold:
+          type: integer
+          minimum: 0
+          example: 100
+    AssetCreateRequest:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          example: laptop
+        value:
+          type: integer
+          minimum: 0
+          example: 50
+        size:
+          type: integer
+          minimum: 0
+          example: 120
+        is_decoy:
+          type: boolean
+          example: false
+        is_trap:
+          type: boolean
+          example: false
+    AssetUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: laptop
+        value:
+          type: integer
+          minimum: 0
+          example: 50
+        size:
+          type: integer
+          minimum: 0
+          example: 120
+        is_decoy:
+          type: boolean
+          example: false
+        is_trap:
+          type: boolean
+          example: false
+    ConnectionCreateRequest:
+      type: object
+      required: [target_ip, status]
+      properties:
+        target_ip:
+          type: string
+          example: 192.168.1.5
+        status:
+          type: string
+          enum: [blocked, friend, bot]
+          example: friend
+    ConnectionUpdateRequest:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [blocked, friend, bot]
+          example: friend
     SessionResponse:
       type: object
       properties:
