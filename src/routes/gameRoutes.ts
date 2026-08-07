@@ -11,17 +11,6 @@ gameRoutes.patch('/players/status', authMiddleware, playerController.updateStatu
 gameRoutes.get('/players', authMiddleware, playerController.listPlayers);
 gameRoutes.delete('/players', authMiddleware, adminMiddleware, playerController.deleteAllPlayers);
 gameRoutes.delete('/players/:id', authMiddleware, adminMiddleware, playerController.deletePlayer);
-gameRoutes.delete('/players/:id/abilities', authMiddleware, adminMiddleware, playerController.deleteAllPlayerAbilities);
-gameRoutes.delete('/players/:playerId/abilities/:abilityId', authMiddleware, adminMiddleware, playerController.deletePlayerAbility);
-gameRoutes.post('/players/:id/abilities', authMiddleware, playerController.assignAbility);
-gameRoutes.get('/players/:id/abilities', authMiddleware, playerController.getPlayerAbilities);
-
-gameRoutes.get('/abilities', playerController.listAbilities);
-gameRoutes.post('/abilities', authMiddleware, adminMiddleware, playerController.createAbility);
-gameRoutes.patch('/abilities/:id', authMiddleware, adminMiddleware, playerController.updateAbility);
-gameRoutes.delete('/abilities', authMiddleware, adminMiddleware, playerController.deleteAllAbilities);
-gameRoutes.delete('/abilities/:id', authMiddleware, adminMiddleware, playerController.deleteAbility);
-gameRoutes.get('/abilities/:id', playerController.getAbilityById);
 
 gameRoutes.patch('/system', authMiddleware, systemController.updateSystem);
 gameRoutes.get('/system/network', authMiddleware, systemController.getNetwork);

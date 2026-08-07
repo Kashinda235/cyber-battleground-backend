@@ -1,6 +1,6 @@
 import { and, desc, eq, sql } from 'drizzle-orm';
 import { db } from '../db/db.js';
-import { abilities, chatLogs, globalState, moveLogs, playerAbilities, players } from '../db/schema.js';
+import { chatLogs, globalState, moveLogs, players } from '../db/schema.js';
 import { AppError } from '../middleware/errorHandler.js';
 
 const DEFAULT_STATE = {
@@ -21,28 +21,10 @@ export const gameService = {
         throw new AppError('Target not found', 404);
       }
 
-      // const [abilityAssignment] = await tx.select().from(playerAbilities).where(and(eq(playerAbilities.playerId, playerId), eq(playerAbilities.abilityId, input.abilityId))).limit(1);
-      // if (!abilityAssignment) {
-      //   throw new AppError('Ability not assigned to player', 404);
-      // }
-      //
-      // const [ability] = await tx.select().from(abilities).where(eq(abilities.id, input.abilityId)).limit(1);
-      // if (!ability) {
-      //   throw new AppError('Ability not found', 404);
-      // }
-
       const now = new Date();
-      // if (abilityAssignment.cooldownUntil > now) {
-      //   throw new AppError('Ability is on cooldown', 409);
-      // }
 
-      // const power = (ability.stats as Record<string, unknown>)?.power ?? 0;
       const damage = 10;
       const cooldownUntil = new Date(now.getTime() + 30_000);
-
-      await tx.update(playerAbilities)
-        .set({ cooldownUntil })
-        .where(and(eq(playerAbilities.playerId, playerId), eq(playerAbilities.abilityId, input.abilityId)));
 
       const [move] = await tx.insert(moveLogs).values({
         playerId,
@@ -126,11 +108,9 @@ export const gameService = {
 
   async resetGame() {
     return db.transaction(async (tx) => {
-      await tx.delete(playerAbilities);
       await tx.delete(moveLogs);
       await tx.delete(chatLogs);
       await tx.delete(globalState);
-      await tx.delete(abilities);
       await tx.delete(players);
       return { success: true, message: 'Game reset complete' };
     });
