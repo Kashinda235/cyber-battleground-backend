@@ -1,8 +1,10 @@
 import { InferSelectModel, InferInsertModel } from 'drizzle-orm';
-import { index, primaryKey, integer, jsonb, pgEnum, pgTable, serial, text, timestamp, varchar } from 'drizzle-orm/pg-core';
+import { index, primaryKey, boolean, integer, jsonb, pgEnum, pgTable, serial, text, timestamp, varchar } from 'drizzle-orm/pg-core';
 
 export const userRole = pgEnum('user_role', ['admin', 'moderator', 'red', 'blue', 'spectator', 'bot']);
 export const userStatus = pgEnum('user_status', ['online', 'offline', 'banned']);
+export const connectionStatusEnum = pgEnum('connection_status', ['blocked', 'friend', 'bot']);
+export const messageTypeEnum = pgEnum('message_type', ['chat', 'mail']);
 
 export const players = pgTable('players', {
   id: serial('id').primaryKey(),
@@ -12,22 +14,6 @@ export const players = pgTable('players', {
   joinedAt: timestamp('joined_at', { withTimezone: true }).defaultNow().notNull(),
   lastSeen: timestamp('last_seen', { withTimezone: true }).defaultNow().notNull(),
 });
-
-export const abilities = pgTable('abilities', {
-  id: serial('id').primaryKey(),
-  name: varchar('name', { length: 64 }).notNull(),
-  description: text('description').notNull(),
-  type: varchar('type', { length: 48 }).notNull(),
-  stats: jsonb('stats').notNull(),
-});
-
-export const playerAbilities = pgTable('player_abilities', {
-  playerId: integer('player_id').notNull().references(() => players.id),
-  abilityId: integer('ability_id').notNull().references(() => abilities.id),
-  cooldownUntil: timestamp('cooldown_until', { withTimezone: true }).notNull(),
-}, table => ({
-  pk: primaryKey(table.playerId, table.abilityId),
-}));
 
 export const moveLogs = pgTable('move_logs', {
   id: serial('id').primaryKey(),
@@ -48,25 +34,66 @@ export const globalState = pgTable('global_state', {
 
 export const chatLogs = pgTable('chat_logs', {
   id: serial('id').primaryKey(),
-  senderId: integer('sender_id').notNull().references(() => players.id),
+  senderId: integer('sender_id').notNull().references(() => players.id, { onDelete: 'cascade' }),
+  receiverId: integer('receiver_id').references(() => players.id, { onDelete: 'cascade' }),
   message: text('message').notNull(),
   timestamp: timestamp('timestamp', { withTimezone: true }).notNull(),
-  metadata: jsonb('metadata').notNull(),
-  tags: jsonb('tags').notNull(),
+  type: messageTypeEnum('type').default('chat').notNull(),
+  metadata: jsonb('metadata').default({}).notNull(),
+  tags: jsonb('tags').default([]).notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
 }, table => ({
   timestampIndex: index('chat_logs_timestamp_idx')
       .on(table.timestamp.desc()),
 }));
 
+export const systems = pgTable('systems', {
+  id: serial('id').primaryKey(),
+  playerId: integer('player_id').notNull().references(() => players.id, { onDelete: 'cascade' }),
+  ip: varchar('ip', { length: 45 }).notNull().unique(), // IPv4/IPv6 length
+  hostname: varchar('hostname', { length: 255 }).notNull(),
+  password: text('password').notNull(),
+  mail: varchar('mail', { length: 255 }).notNull().unique(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+});
+
+export const networks = pgTable('networks', {
+  id: serial('id').primaryKey(),
+  systemId: integer('system_id').notNull().references(() => systems.id, { onDelete: 'cascade' }),
+  port: integer('port').notNull(),
+  status: varchar('status', { length: 50 }).notNull().default('open'), // e.g., open, closed, filtered
+  metadata: jsonb('metadata').default({}).notNull(),
+});
+
+export const connections = pgTable('connections', {
+  id: serial('id').primaryKey(),
+  systemId: integer('system_id').notNull().references(() => systems.id, { onDelete: 'cascade' }),
+  targetIp: varchar('target_ip', { length: 45 }).notNull(),
+  status: connectionStatusEnum('status').notNull().default('friend'),
+});
+
+export const defenses = pgTable('defenses', {
+  id: serial('id').primaryKey(),
+  systemId: integer('system_id').notNull().unique().references(() => systems.id, { onDelete: 'cascade' }),
+  firewallLevel: integer('firewall_level').default(1).notNull(),
+  idsStatus: boolean('ids_status').default(false).notNull(),
+  honeypotActive: boolean('honeypot_active').default(false).notNull(),
+  lockdownActive: boolean('lockdown_active').default(false).notNull(),
+  autoPayThreshold: integer('autopay_threshold').default(0).notNull(),
+});
+
+export const assets = pgTable('assets', {
+  id: serial('id').primaryKey(),
+  systemId: integer('system_id').notNull().references(() => systems.id, { onDelete: 'cascade' }),
+  name: varchar('name', { length: 255 }).notNull(),
+  value: integer('value').default(0).notNull(),
+  size: integer('size').default(0).notNull(), // size in MB/GB/KB
+  isDecoy: boolean('is_decoy').default(false).notNull(),
+  isTrap: boolean('is_trap').default(false).notNull(),
+});
+
 export type Player = InferSelectModel<typeof players>;
 export type NewPlayer = InferInsertModel<typeof players>;
-
-export type Ability = InferSelectModel<typeof abilities>;
-export type NewAbility = InferInsertModel<typeof abilities>;
-
-export type PlayerAbility = InferSelectModel<typeof playerAbilities>;
-export type NewPlayerAbility = InferInsertModel<typeof playerAbilities>;
 
 export type MoveLog = InferSelectModel<typeof moveLogs>;
 export type NewMoveLog = InferInsertModel<typeof moveLogs>;
@@ -76,3 +103,18 @@ export type NewGlobalState = InferInsertModel<typeof globalState>;
 
 export type ChatLog = InferSelectModel<typeof chatLogs>;
 export type NewChatLog = InferInsertModel<typeof chatLogs>;
+
+export type System = InferSelectModel<typeof systems>;
+export type NewSystem = InferInsertModel<typeof systems>;
+
+export type Network = InferSelectModel<typeof networks>;
+export type NewNetwork = InferInsertModel<typeof networks>;
+
+export type Connection = InferSelectModel<typeof connections>;
+export type NewConnection = InferInsertModel<typeof connections>;
+
+export type Defense = InferSelectModel<typeof defenses>;
+export type NewDefense = InferInsertModel<typeof defenses>;
+
+export type Asset = InferSelectModel<typeof assets>;
+export type NewAsset = InferInsertModel<typeof assets>;

@@ -8,6 +8,13 @@
       "when": 1784557521767,
       "tag": "0000_mixed_mojo",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1786029876533,
+      "tag": "0001_cloudy_jocasta",
+      "breakpoints": true
     }
   ]
 }
