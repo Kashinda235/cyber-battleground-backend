@@ -1,0 +1,126 @@
+### Authentication
+POST http://localhost:8000/auth/register
+Content-Type: application/json
+
+{
+  "username": "test-player",
+  "role": "blue"
+}
+
+###
+POST http://localhost:8000/auth/login
+Content-Type: application/json
+
+{
+  "username": "test-player"
+}
+
+### Use the returned token for protected requests
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwbGF5ZXJJZCI6MTEsInVzZXJuYW1lIjoidGVzdC1wbGF5ZXIiLCJyb2xlIjoiYmx1ZSIsImlhdCI6MTc4NjA4NjU4MX0.VRnXwTAToMBbnfQBxcq8_cOQRYPRjqRXuPRxDrLFHTk
+
+### Player profile
+GET http://localhost:8000/players/me
+Authorization: Bearer {{token}}
+
+### Update system config
+PATCH http://localhost:8000/system
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "hostname": "test-machine",
+  "password": "new-password",
+  "mail": "test-player@example.com"
+}
+
+### Get network config
+GET http://localhost:8000/system/network
+Authorization: Bearer {{token}}
+
+### Update one network port
+PATCH http://localhost:8000/system/network/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "port": 22,
+  "status": "open",
+  "metadata": {
+    "service": "ssh"
+  }
+}
+
+### Get defense config
+GET http://localhost:8000/system/defense
+Authorization: Bearer {{token}}
+
+### Update defense config
+PATCH http://localhost:8000/system/defense
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "firewall_level": 2,
+  "ids_status": true,
+  "honeypot_active": false,
+  "lockdown_active": true,
+  "autopay_threshold": 100
+}
+
+### List assets
+GET http://localhost:8000/system/assets
+Authorization: Bearer {{token}}
+
+### Create asset
+POST http://localhost:8000/system/assets
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "laptop",
+  "value": 50,
+  "size": 120,
+  "is_decoy": false,
+  "is_trap": false
+}
+
+### Update asset
+PATCH http://localhost:8000/system/assets/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "server-laptop",
+  "value": 75
+}
+
+### Delete asset
+DELETE http://localhost:8000/system/assets/1
+Authorization: Bearer {{token}}
+
+### List connections
+GET http://localhost:8000/player/connections
+Authorization: Bearer {{token}}
+
+### Create connection
+POST http://localhost:8000/player/connections
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "target_ip": "192.168.1.20",
+  "status": "friend"
+}
+
+### Update connection
+PATCH http://localhost:8000/player/connections/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "status": "blocked"
+}
+
+### Delete connection
+DELETE http://localhost:8000/player/connections/1
+Authorization: Bearer {{token}}
