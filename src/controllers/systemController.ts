@@ -14,6 +14,15 @@ export const systemController = {
     }
   },
 
+  async listSystems(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+    try {
+      const result = await systemService.listSystems();
+      res.json(result);
+    } catch (error) {
+      next(error);
+    }
+  },
+
   async updateSystem(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
       const data = patchSystemSchema.parse(req.body);

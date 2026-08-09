@@ -3,8 +3,8 @@ POST http://localhost:8000/auth/register
 Content-Type: application/json
 
 {
-  "username": "test-player",
-  "role": "blue"
+  "username": "Krishna",
+  "role": "admin"
 }
 
 ###
@@ -33,12 +33,16 @@ Content-Type: application/json
   "mail": "test-player@example.com"
 }
 
+### Get all sysytem db
+GET http://localhost:8000/systems
+Authorization: Bearer {{token}}
+
 ### Get network config
 GET http://localhost:8000/system/network
 Authorization: Bearer {{token}}
 
 ### Update one network port
-PATCH http://localhost:8000/system/network/1
+PATCH http://localhost:8000/system/network/4
 Authorization: Bearer {{token}}
 Content-Type: application/json
 

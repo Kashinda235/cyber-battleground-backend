@@ -12,15 +12,18 @@ gameRoutes.get('/players', authMiddleware, playerController.listPlayers);
 gameRoutes.delete('/players', authMiddleware, adminMiddleware, playerController.deleteAllPlayers);
 gameRoutes.delete('/players/:id', authMiddleware, adminMiddleware, playerController.deletePlayer);
 
+gameRoutes.get('/systems', authMiddleware, systemController.listSystems);
 gameRoutes.patch('/system', authMiddleware, systemController.updateSystem);
 gameRoutes.get('/system/network', authMiddleware, systemController.getNetwork);
 gameRoutes.patch('/system/network/:id', authMiddleware, systemController.updateNetwork);
 gameRoutes.get('/system/defense', authMiddleware, systemController.getDefense);
 gameRoutes.patch('/system/defense', authMiddleware, systemController.updateDefense);
+
 gameRoutes.get('/system/assets', authMiddleware, systemController.listAssets);
 gameRoutes.post('/system/assets', authMiddleware, systemController.createAsset);
 gameRoutes.patch('/system/assets/:id', authMiddleware, systemController.updateAsset);
 gameRoutes.delete('/system/assets/:id', authMiddleware, systemController.deleteAsset);
+
 gameRoutes.get('/player/connections', authMiddleware, systemController.listConnections);
 gameRoutes.post('/player/connections', authMiddleware, systemController.createConnection);
 gameRoutes.patch('/player/connections/:id', authMiddleware, systemController.updateConnection);

@@ -12,13 +12,13 @@ export const systemService = {
       throw new AppError('System already exists for player', 409);
     }
 
-    const ip = `10.0.${playerId}.${Math.max(1, playerId % 254)}`;
+    const ip = `192.168.${Math.floor(playerId / 254 + 2)}.${Math.max(1, playerId % 254)}`;
     const [system] = await executor.insert(systems).values({
       playerId,
       ip,
       hostname: `${username}-machine`,
       password: 'changeme',
-      mail: `${username}@example.com`,
+      mail: `${username}@cybermail.com`,
     }).returning();
 
     const networkRows = DEFAULT_NETWORK_PORTS.map((port) => ({
@@ -56,6 +56,10 @@ export const systemService = {
     const networkConfigs = await db.select().from(networks).where(eq(networks.systemId, system.id));
 
     return { player, system, defense, network: networkConfigs };
+  },
+
+  async listSystems() {
+    return db.select().from(systems);
   },
 
   async updateSystem(playerId: number, data: { hostname?: string; password?: string; mail?: string }) {
