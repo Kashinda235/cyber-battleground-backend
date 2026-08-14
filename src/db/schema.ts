@@ -116,6 +116,9 @@ export type NewGlobalState = InferInsertModel<typeof globalState>;
 export type ChatLog = InferSelectModel<typeof chatLogs>;
 export type NewChatLog = InferInsertModel<typeof chatLogs>;
 
+export type Mail = InferSelectModel<typeof mails>;
+export type NewMail = InferInsertModel<typeof mails>;
+
 export type System = InferSelectModel<typeof systems>;
 export type NewSystem = InferInsertModel<typeof systems>;
 
