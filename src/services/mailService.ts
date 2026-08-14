@@ -13,7 +13,7 @@ export const mailService = {
   },
 
   async sendMail(senderId: number, input: { receiverId: number; message: string; phishingPayload?: boolean;}) {
-    const [sender] = await db.select().from(players).where(eq(players.id, input.receiverId)).limit(1);
+    const [sender] = await db.select().from(players).where(eq(players.id, senderId)).limit(1);
     const [receiver] = await db.select().from(players).where(eq(players.id, input.receiverId)).limit(1);
     if (!receiver) {
       throw new AppError('Receiver not found', 404);
