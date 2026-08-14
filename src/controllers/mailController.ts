@@ -36,7 +36,7 @@ export const mailController = {
     try {
       const { id } = idParamSchema.parse(req.params);
       const data = updateMailSchema.parse(req.body);
-      const result = await mailService.updateSeen(req.user!.playerId, id, data.is_seen);
+      const result = await mailService.updateSeen(req.user!.playerId, id, data.isSeen);
       res.json(result);
     } catch (error) {
       next(error);

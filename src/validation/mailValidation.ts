@@ -1,14 +1,13 @@
 import { z } from 'zod';
 
 export const sendMailSchema = z.object({
-  receiver_id: z.coerce.number().int().positive(),
+  receiverId: z.coerce.number().int().positive(),
   message: z.string().min(1),
-  phishing_payload: z.boolean().optional().default(false),
-  metadata: z.record(z.any()).optional(),
+  phishingPayload: z.boolean().optional().default(false),
 });
 
 export const updateMailSchema = z.object({
-  is_seen: z.boolean(),
+  isSeen: z.boolean(),
 });
 
 export const idParamSchema = z.object({

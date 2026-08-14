@@ -30,7 +30,6 @@ gameRoutes.post('/player/connections', authMiddleware, systemController.createCo
 gameRoutes.patch('/player/connections/:id', authMiddleware, systemController.updateConnection);
 gameRoutes.delete('/player/connections/:id', authMiddleware, systemController.deleteConnection);
 
-// Mail endpoints
 gameRoutes.get('/mail/inbox', authMiddleware, mailController.inbox);
 gameRoutes.get('/mail/sent', authMiddleware, mailController.sent);
 gameRoutes.post('/mail', authMiddleware, mailController.sendMail);

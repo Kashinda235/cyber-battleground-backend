@@ -12,19 +12,22 @@ export const mailService = {
     return db.select().from(mails).where(eq(mails.senderId, playerId)).orderBy(desc(mails.timestamp));
   },
 
-  async sendMail(senderId: number, input: { receiver_id: number; message: string; phishing_payload?: boolean; metadata?: Record<string, unknown> }) {
-    const [receiver] = await db.select().from(players).where(eq(players.id, input.receiver_id)).limit(1);
+  async sendMail(senderId: number, input: { receiverId: number; message: string; phishingPayload?: boolean;}) {
+    const [sender] = await db.select().from(players).where(eq(players.id, input.receiverId)).limit(1);
+    const [receiver] = await db.select().from(players).where(eq(players.id, input.receiverId)).limit(1);
     if (!receiver) {
       throw new AppError('Receiver not found', 404);
     }
 
     const [mail] = await db.insert(mails).values({
       senderId,
-      receiverId: input.receiver_id,
+      receiverId: input.receiverId,
       message: input.message,
       isSeen: false,
-      phishingPayload: input.phishing_payload ?? false,
-      metadata: input.metadata ?? {},
+      phishingPayload: input.phishingPayload ?? false,
+      metadata: {
+        reward: 10000, sender: `${sender.username.toLowerCase()}@cyber.org`
+      },
       timestamp: new Date(),
       createdAt: new Date(),
     }).returning();
