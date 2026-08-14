@@ -1157,6 +1157,147 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SessionResponse'
+  /mail/inbox:
+    get:
+      summary: Get received mails for authenticated player
+      tags:
+        - Mail
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Inbox mails returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Mail'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /mail/sent:
+    get:
+      summary: Get sent mails for authenticated player
+      tags:
+        - Mail
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Sent mails returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Mail'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /mail:
+    post:
+      summary: Send a mail to another player
+      tags:
+        - Mail
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MailCreateRequest'
+      responses:
+        '201':
+          description: Mail sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Mail'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /mail/{id}:
+    patch:
+      summary: Update mail seen status
+      tags:
+        - Mail
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MailUpdateRequest'
+      responses:
+        '200':
+          description: Mail updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Mail'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Mail not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      summary: Delete a mail by ID
+      tags:
+        - Mail
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Mail deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteResult'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Mail not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 components:
   securitySchemes:
     bearerAuth:
@@ -1667,3 +1808,57 @@ components:
         error:
           type: string
           example: Player not found
+    Mail:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        senderId:
+          type: integer
+          example: 1
+        receiverId:
+          type: integer
+          example: 2
+        message:
+          type: string
+          example: You've got mail'
+        isSeen:
+          type: boolean
+          example: false
+        phishingPayload:
+          type: boolean
+          example: false
+        metadata:
+          type: object
+          additionalProperties: true
+        createdAt:
+          type: string
+          format: date-time
+        timestamp:
+          type: string
+          format: date-time
+    MailCreateRequest:
+      type: object
+      required: [receiver_id, message]
+      properties:
+        receiver_id:
+          type: integer
+          minimum: 1
+          example: 2
+        message:
+          type: string
+          example: Important update
+        phishing_payload:
+          type: boolean
+          example: false
+        metadata:
+          type: object
+          additionalProperties: true
+    MailUpdateRequest:
+      type: object
+      required: [is_seen]
+      properties:
+        is_seen:
+          type: boolean
+          example: true

@@ -4,7 +4,6 @@ import { index, primaryKey, boolean, integer, jsonb, pgEnum, pgTable, serial, te
 export const userRole = pgEnum('user_role', ['admin', 'moderator', 'red', 'blue', 'spectator', 'bot']);
 export const userStatus = pgEnum('user_status', ['online', 'offline', 'banned']);
 export const connectionStatusEnum = pgEnum('connection_status', ['blocked', 'friend', 'bot']);
-export const messageTypeEnum = pgEnum('message_type', ['chat', 'mail']);
 
 export const players = pgTable('players', {
   id: serial('id').primaryKey(),
@@ -17,8 +16,8 @@ export const players = pgTable('players', {
 
 export const moveLogs = pgTable('move_logs', {
   id: serial('id').primaryKey(),
-  playerId: integer('player_id').notNull().references(() => players.id),
-  targetId: integer('target_id').notNull().references(() => players.id),
+  playerId: integer('player_id').notNull().references(() => players.id, { onDelete: 'cascade' }),
+  targetId: integer('target_id').notNull().references(() => players.id, { onDelete: 'cascade' }),
   action: text('action').notNull(),
   metadata: jsonb('metadata').notNull(),
   timestamp: timestamp('timestamp', { withTimezone: true }).defaultNow().notNull(),
@@ -34,16 +33,29 @@ export const globalState = pgTable('global_state', {
 
 export const chatLogs = pgTable('chat_logs', {
   id: serial('id').primaryKey(),
-  senderId: integer('sender_id').notNull().references(() => players.id, { onDelete: 'cascade' }),
-  receiverId: integer('receiver_id').references(() => players.id, { onDelete: 'cascade' }),
+  senderId: integer('sender_id').notNull().references(() => players.id),
   message: text('message').notNull(),
   timestamp: timestamp('timestamp', { withTimezone: true }).notNull(),
-  type: messageTypeEnum('type').default('chat').notNull(),
-  metadata: jsonb('metadata').default({}).notNull(),
-  tags: jsonb('tags').default([]).notNull(),
+  metadata: jsonb('metadata').notNull(),
+  tags: jsonb('tags').notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
 }, table => ({
   timestampIndex: index('chat_logs_timestamp_idx')
+      .on(table.timestamp.desc()),
+}));
+
+export const mails = pgTable('mails', {
+  id: serial('id').primaryKey(),
+  senderId: integer('sender_id').notNull().references(() => players.id, { onDelete: 'cascade' }),
+  receiverId: integer('receiver_id').notNull().references(() => players.id, { onDelete: 'cascade' }),
+  message: text('message').notNull(),
+  isSeen: boolean('is_seen').default(false).notNull(),
+  phishingPayload: boolean('phishing_payload').default(false).notNull(),
+  metadata: jsonb('metadata'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  timestamp: timestamp('time_stamp', { withTimezone: true }).notNull(),
+}, table => ({
+  timestampIndex: index('mails_timestamp_idx')
       .on(table.timestamp.desc()),
 }));
 

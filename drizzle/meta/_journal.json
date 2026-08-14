@@ -15,6 +15,13 @@
       "when": 1786029876533,
       "tag": "0001_cloudy_jocasta",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1786690974755,
+      "tag": "0002_abandoned_mole_man",
+      "breakpoints": true
     }
   ]
 }

@@ -3,8 +3,8 @@ POST http://localhost:8000/auth/register
 Content-Type: application/json
 
 {
-  "username": "Krishna",
-  "role": "admin"
+  "username": "Guest-player",
+  "role": "spectator"
 }
 
 ###
@@ -12,11 +12,11 @@ POST http://localhost:8000/auth/login
 Content-Type: application/json
 
 {
-  "username": "test-player"
+  "username": "Guest-player"
 }
 
 ### Use the returned token for protected requests
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwbGF5ZXJJZCI6MTEsInVzZXJuYW1lIjoidGVzdC1wbGF5ZXIiLCJyb2xlIjoiYmx1ZSIsImlhdCI6MTc4NjA4NjU4MX0.VRnXwTAToMBbnfQBxcq8_cOQRYPRjqRXuPRxDrLFHTk
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwbGF5ZXJJZCI6MjAsInVzZXJuYW1lIjoiR3Vlc3QtcGxheWVyIiwicm9sZSI6InNwZWN0YXRvciIsImlhdCI6MTc4NjY5NDM3OX0.wQuikOjClFHg7yaHsx2UWIgXMDv25crMTblfeen8QBg
 
 ### Player profile
 GET http://localhost:8000/players/me
@@ -127,4 +127,37 @@ Content-Type: application/json
 
 ### Delete connection
 DELETE http://localhost:8000/player/connections/1
+Authorization: Bearer {{token}}
+
+### Inbox
+GET http://localhost:8000/mail/inbox
+Authorization: Bearer {{token}}
+
+### Sent
+GET http://localhost:8000/mail/sent
+Authorization: Bearer {{token}}
+
+### Send mail
+POST http://localhost:8000/mail
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "receiver_id": 18,
+  "message": "Hello from test",
+  "phishing_payload": false,
+  "metadata": { "topic": "test" }
+}
+
+### Update seen
+PATCH http://localhost:8000/mail/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "is_seen": true
+}
+
+### Delete mail
+DELETE http://localhost:8000/mail/1
 Authorization: Bearer {{token}}

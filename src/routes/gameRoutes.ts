@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { gameController } from '../controllers/gameController.js';
 import { playerController } from '../controllers/playerController.js';
 import { systemController } from '../controllers/systemController.js';
+import { mailController } from '../controllers/mailController.js';
 import { authMiddleware, adminMiddleware } from '../middleware/auth.js';
 
 export const gameRoutes = Router();
@@ -28,6 +29,13 @@ gameRoutes.get('/player/connections', authMiddleware, systemController.listConne
 gameRoutes.post('/player/connections', authMiddleware, systemController.createConnection);
 gameRoutes.patch('/player/connections/:id', authMiddleware, systemController.updateConnection);
 gameRoutes.delete('/player/connections/:id', authMiddleware, systemController.deleteConnection);
+
+// Mail endpoints
+gameRoutes.get('/mail/inbox', authMiddleware, mailController.inbox);
+gameRoutes.get('/mail/sent', authMiddleware, mailController.sent);
+gameRoutes.post('/mail', authMiddleware, mailController.sendMail);
+gameRoutes.patch('/mail/:id', authMiddleware, mailController.updateSeen);
+gameRoutes.delete('/mail/:id', authMiddleware, mailController.deleteMail);
 
 gameRoutes.post('/actions', authMiddleware, gameController.createAction);
 gameRoutes.get('/actions', gameController.getMoves);
