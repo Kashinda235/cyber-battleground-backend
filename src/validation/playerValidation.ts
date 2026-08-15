@@ -4,6 +4,11 @@ export const statusSchema = z.object({
     status: z.enum(['online', 'offline', 'banned']),
 });
 
+export const statsSchema = z.object({
+    health: z.coerce.number().int().min(0).max(100),
+    xp: z.coerce.number().int().nonnegative(),
+});
+
 export const assignAbilitySchema = z.object({
     ability_id: z.number().int().positive(),
 });

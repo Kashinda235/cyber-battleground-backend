@@ -9,6 +9,7 @@ export const gameRoutes = Router();
 
 gameRoutes.get('/players/me', authMiddleware, playerController.me);
 gameRoutes.patch('/players/status', authMiddleware, playerController.updateStatus);
+gameRoutes.patch('/players/stats', authMiddleware, playerController.updateStats);
 gameRoutes.get('/players', authMiddleware, playerController.listPlayers);
 gameRoutes.delete('/players', authMiddleware, adminMiddleware, playerController.deleteAllPlayers);
 gameRoutes.delete('/players/:id', authMiddleware, adminMiddleware, playerController.deletePlayer);

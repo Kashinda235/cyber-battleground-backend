@@ -1,5 +1,5 @@
-import { InferSelectModel, InferInsertModel } from 'drizzle-orm';
-import { index, primaryKey, boolean, integer, jsonb, pgEnum, pgTable, serial, text, timestamp, varchar } from 'drizzle-orm/pg-core';
+import { InferSelectModel, InferInsertModel, sql } from 'drizzle-orm';
+import { index, primaryKey, boolean, integer, jsonb, pgEnum, pgTable, serial, text, timestamp, varchar, check } from 'drizzle-orm/pg-core';
 
 export const userRole = pgEnum('user_role', ['admin', 'moderator', 'red', 'blue', 'spectator', 'bot']);
 export const userStatus = pgEnum('user_status', ['online', 'offline', 'banned']);
@@ -10,9 +10,12 @@ export const players = pgTable('players', {
   username: varchar('username', { length: 32 }).notNull(),
   role: userRole('role').default('spectator').notNull(),
   status: userStatus('status').default('offline').notNull(),
+  xp: integer('xp').default(50).notNull(),
   joinedAt: timestamp('joined_at', { withTimezone: true }).defaultNow().notNull(),
   lastSeen: timestamp('last_seen', { withTimezone: true }).defaultNow().notNull(),
-});
+}, (table) => [
+  check('xp_check', sql`${table.xp} >= 0`)
+]);
 
 export const moveLogs = pgTable('move_logs', {
   id: serial('id').primaryKey(),
@@ -66,8 +69,11 @@ export const systems = pgTable('systems', {
   hostname: varchar('hostname', { length: 255 }).notNull(),
   password: text('password').notNull(),
   mail: varchar('mail', { length: 255 }).notNull().unique(),
+  health: integer('health').default(100).notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
-});
+}, (table) => [
+  check('health_check', sql`${table.health} >= 0`)
+]);
 
 export const networks = pgTable('networks', {
   id: serial('id').primaryKey(),

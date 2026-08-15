@@ -1,7 +1,7 @@
-import { and, eq } from 'drizzle-orm';
-import { db } from '../db/db.js';
-import { players } from '../db/schema.js';
-import { AppError } from '../middleware/errorHandler.js';
+import {eq} from 'drizzle-orm';
+import {db} from '../db/db.js';
+import {players, systems} from '../db/schema.js';
+import {AppError} from '../middleware/errorHandler.js';
 
 export const playerService = {
   async getMe(playerId: number) {
@@ -18,6 +18,23 @@ export const playerService = {
       throw new AppError('Player not found', 404);
     }
     return player;
+  },
+
+  async updateStats(playerId: number, input: {health: number; xp: number}) {
+    const [player] = await db.update(players).set({
+      xp: input.xp,
+      lastSeen: new Date()
+    }).where(eq(players.id, playerId)).returning();
+    const [system] = await db.update(systems).set({health: input.health}).where(eq(systems.playerId, playerId)).returning();
+    if (!player) {
+      throw new AppError('Player not found', 404);
+    }
+    return {
+      id: player.id,
+      xp: player.xp,
+      health: system.health,
+      lastSeen: player.lastSeen
+    };
   },
 
   async listPlayers() {

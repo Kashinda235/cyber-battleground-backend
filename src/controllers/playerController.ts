@@ -1,5 +1,13 @@
 import { NextFunction, Request, Response } from 'express';
-import { statusSchema, assignAbilitySchema, createAbilitySchema, playerIdParamSchema, playerAbilityParamSchema, updateAbilitySchema } from '../validation/playerValidation.js';
+import {
+  statusSchema,
+  assignAbilitySchema,
+  createAbilitySchema,
+  playerIdParamSchema,
+  playerAbilityParamSchema,
+  updateAbilitySchema,
+  statsSchema
+} from '../validation/playerValidation.js';
 import { playerService } from '../services/playerService.js';
 import { systemService } from '../services/systemService.js';
 import { AuthenticatedRequest } from '../middleware/auth.js';
@@ -18,6 +26,16 @@ export const playerController = {
     try {
       const data = statusSchema.parse(req.body);
       const result = await playerService.updateStatus(req.user!.playerId, data.status);
+      res.json(result);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async updateStats(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+    try {
+      const data = statsSchema.parse(req.body);
+      const result = await playerService.updateStats(req.user!.playerId, data);
       res.json(result);
     } catch (error) {
       next(error);
