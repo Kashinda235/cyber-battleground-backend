@@ -15,13 +15,16 @@ const {
   broadcastPlayerLeft,
   broadcastPerformedAction,
   broadcastGameState,
-  broadcastMessage } = attachWebSocketServer(server);
+  broadcastMessage,
+  broadcastSendMail,
+} = attachWebSocketServer(server);
 
 app.locals.broadcastPlayerJoined = broadcastPlayerJoined;
 app.locals.broadcastPlayerLeft = broadcastPlayerLeft;
 app.locals.broadcastPerformedAction = broadcastPerformedAction;
 app.locals.broadcastGameState = broadcastGameState;
 app.locals.broadcastMessage = broadcastMessage;
+app.locals.broadcastSendMail = broadcastSendMail;
 
 async function startServer() {
   try {

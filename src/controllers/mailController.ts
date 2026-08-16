@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { AuthenticatedRequest } from '../middleware/auth.js';
 import { mailService } from '../services/mailService.js';
 import { sendMailSchema, updateMailSchema, idParamSchema } from '../validation/mailValidation.js';
+import {app} from "../app.js";
 
 export const mailController = {
   async inbox(req: AuthenticatedRequest, res: Response, next: NextFunction) {
@@ -26,6 +27,9 @@ export const mailController = {
     try {
       const data = sendMailSchema.parse(req.body);
       const result = await mailService.sendMail(req.user!.playerId, data);
+      if (app.locals.broadcastSendMail) {
+        app.locals.broadcastSendMail(result.receiverId, result);
+      }
       res.status(201).json(result);
     } catch (error) {
       next(error);

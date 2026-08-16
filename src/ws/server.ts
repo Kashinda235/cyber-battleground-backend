@@ -138,11 +138,21 @@ export function attachWebSocketServer(server: Server) {
         broadcast(wss, { type: 'chat', data: message });
     }
 
+    function broadcastSendMail<T = unknown>(targetId: number, mail: T): void {
+        for (const client of wss.clients) {
+            const ws = client as CustomWebSocket;
+            if (ws.readyState === WebSocket.OPEN && ws.player?.id === Number(targetId)) {
+                sendJson(ws, { type: 'mail', data: mail });
+            }
+        }
+    }
+
     return {
         broadcastPlayerJoined,
         broadcastPlayerLeft,
         broadcastPerformedAction,
         broadcastGameState,
         broadcastMessage,
+        broadcastSendMail,
     };
 }
