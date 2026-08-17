@@ -1,24 +1,29 @@
-import { and, eq } from 'drizzle-orm';
+import {and, eq, ExtractTablesWithRelations} from 'drizzle-orm';
 import { db } from '../db/db.js';
 import { assets, connections, defenses, networks, players, systems } from '../db/schema.js';
 import { AppError } from '../middleware/errorHandler.js';
+import {PgQueryResultHKT, PgTransaction} from "drizzle-orm/pg-core";
+import {NodePgDatabase} from "drizzle-orm/node-postgres";
 
 const DEFAULT_NETWORK_PORTS = [22, 80, 443];
+export type DbOrTx =
+    | NodePgDatabase<Record<string, never>>
+    | PgTransaction<PgQueryResultHKT, Record<string, never>, ExtractTablesWithRelations<Record<string, never>>>;
 
 export const systemService = {
-  async createPlayerSystem(playerId: number, username: string) {
-    const [existingSystem] = await db.select().from(systems).where(eq(systems.playerId, playerId)).limit(1);
+  async createPlayerSystem(playerId: number, username: string, extractor: DbOrTx = db) {
+    const [existingSystem] = await extractor.select().from(systems).where(eq(systems.playerId, playerId)).limit(1);
     if (existingSystem) {
       throw new AppError('System already exists for player', 409);
     }
 
     const ip = `192.168.${Math.floor(playerId / 254 + 2)}.${Math.max(1, playerId % 254)}`;
-    const [system] = await db.insert(systems).values({
+    const [system] = await extractor.insert(systems).values({
       playerId,
       ip,
       hostname: `${username}-machine`,
       password: 'changeme',
-      mail: `${username}@cybermail.com`,
+      mail: `${username}@cyber.org`,
     }).returning();
 
     const networkRows = DEFAULT_NETWORK_PORTS.map((port) => ({
@@ -27,9 +32,9 @@ export const systemService = {
       status: 'open',
       metadata: {},
     }));
-    await db.insert(networks).values(networkRows);
+    await extractor.insert(networks).values(networkRows);
 
-    await db.insert(defenses).values({
+    await extractor.insert(defenses).values({
       systemId: system.id,
       firewallLevel: 1,
       idsStatus: false,

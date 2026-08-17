@@ -21,7 +21,7 @@ export const authService = {
         status: 'online' as any,
       }).returning();
 
-      await systemService.createPlayerSystem(player.id, player.username);
+      await systemService.createPlayerSystem(player.id, player.username, tx);
 
       const token = jwt.sign({ playerId: player.id, username: player.username, role: player.role }, JWT_SECRET);
       return { token, player };

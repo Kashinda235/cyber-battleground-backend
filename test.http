@@ -3,7 +3,7 @@ POST http://localhost:8000/auth/register
 Content-Type: application/json
 
 {
-  "username": "Bot-102",
+  "username": "Prabhakar",
   "role": "bot"
 }
 
