@@ -10,7 +10,7 @@ export const patchSystemSchema = z.object({
 
 export const updateNetworkSchema = z.object({
   port: z.coerce.number().int().positive().optional(),
-  metadata: z.record(z.any()).optional(),
+  metadata: z.record(z.any(), z.any()).optional(),
   status: z.string().trim().min(1).optional(),
 }).refine((data) => Object.keys(data).length > 0, {
   message: 'At least one field is required',

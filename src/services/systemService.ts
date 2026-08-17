@@ -6,14 +6,14 @@ import { AppError } from '../middleware/errorHandler.js';
 const DEFAULT_NETWORK_PORTS = [22, 80, 443];
 
 export const systemService = {
-  async createPlayerSystem(playerId: number, username: string, executor = db) {
-    const [existingSystem] = await executor.select().from(systems).where(eq(systems.playerId, playerId)).limit(1);
+  async createPlayerSystem(playerId: number, username: string) {
+    const [existingSystem] = await db.select().from(systems).where(eq(systems.playerId, playerId)).limit(1);
     if (existingSystem) {
       throw new AppError('System already exists for player', 409);
     }
 
     const ip = `192.168.${Math.floor(playerId / 254 + 2)}.${Math.max(1, playerId % 254)}`;
-    const [system] = await executor.insert(systems).values({
+    const [system] = await db.insert(systems).values({
       playerId,
       ip,
       hostname: `${username}-machine`,
@@ -27,9 +27,9 @@ export const systemService = {
       status: 'open',
       metadata: {},
     }));
-    await executor.insert(networks).values(networkRows);
+    await db.insert(networks).values(networkRows);
 
-    await executor.insert(defenses).values({
+    await db.insert(defenses).values({
       systemId: system.id,
       firewallLevel: 1,
       idsStatus: false,
