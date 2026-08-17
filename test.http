@@ -3,8 +3,8 @@ POST http://localhost:8000/auth/register
 Content-Type: application/json
 
 {
-  "username": "Guest-player",
-  "role": "spectator"
+  "username": "Bot-102",
+  "role": "bot"
 }
 
 ###
