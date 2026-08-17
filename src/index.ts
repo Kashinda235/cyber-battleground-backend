@@ -5,6 +5,7 @@ import {attachWebSocketServer} from "./ws/server.js";
 import {db} from "./db/db.js";
 import {players} from "./db/schema.js";
 import {startBotEngine} from "./game/botServer.js";
+import {ne} from "drizzle-orm";
 
 const PORT = Number(process.env.PORT) || 8000;
 const HOST = process.env.HOST || '0.0.0.0';
@@ -30,7 +31,7 @@ app.locals.broadcastSendMail = broadcastSendMail;
 async function startServer() {
   try {
     console.log("[DB] Resetting stale player statuses...");
-    await db.update(players).set({ status: 'offline' });
+    await db.update(players).set({ status: 'offline' }).where(ne(players.role, "bot"));
     console.log("[DB] All players marked offline.");
 
     server.listen(PORT, HOST, async () => {

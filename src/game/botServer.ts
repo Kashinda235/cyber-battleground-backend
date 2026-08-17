@@ -35,10 +35,8 @@ export async function startBotEngine() {
 
         const targets = activePlayerIds.length > 0 ? activePlayerIds : [1];
 
-        for (const bot of bots) {
-            await botController.sendMail(bot.id, botUtils.getRandomMail(targets));
-            botUtils.delay(10000);
-        }
+        await botController.sendMail(bots[0].id, botUtils.getRandomMail(targets));
+
     }, 2 * 60 * 1000);
 }
 
