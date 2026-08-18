@@ -31,7 +31,7 @@ app.locals.broadcastSendMail = broadcastSendMail;
 async function startServer() {
   try {
     console.log("[DB] Resetting stale player statuses...");
-    await db.update(players).set({ status: 'offline' }).where(ne(players.role, "bot"));
+    await db.update(players).set({ status: 'offline' });
     console.log("[DB] All players marked offline.");
 
     server.listen(PORT, HOST, async () => {
