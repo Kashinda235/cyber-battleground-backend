@@ -1,26 +1,41 @@
 import { Router } from 'express';
 import { gameController } from '../controllers/gameController.js';
 import { playerController } from '../controllers/playerController.js';
+import { systemController } from '../controllers/systemController.js';
+import { mailController } from '../controllers/mailController.js';
 import { authMiddleware, adminMiddleware } from '../middleware/auth.js';
 
 export const gameRoutes = Router();
 
 gameRoutes.get('/players/me', authMiddleware, playerController.me);
 gameRoutes.patch('/players/status', authMiddleware, playerController.updateStatus);
+gameRoutes.patch('/players/stats', authMiddleware, playerController.updateStats);
 gameRoutes.get('/players', authMiddleware, playerController.listPlayers);
 gameRoutes.delete('/players', authMiddleware, adminMiddleware, playerController.deleteAllPlayers);
 gameRoutes.delete('/players/:id', authMiddleware, adminMiddleware, playerController.deletePlayer);
-gameRoutes.delete('/players/:id/abilities', authMiddleware, adminMiddleware, playerController.deleteAllPlayerAbilities);
-gameRoutes.delete('/players/:playerId/abilities/:abilityId', authMiddleware, adminMiddleware, playerController.deletePlayerAbility);
-gameRoutes.post('/players/:id/abilities', authMiddleware, playerController.assignAbility);
-gameRoutes.get('/players/:id/abilities', authMiddleware, playerController.getPlayerAbilities);
 
-gameRoutes.get('/abilities', playerController.listAbilities);
-gameRoutes.post('/abilities', authMiddleware, adminMiddleware, playerController.createAbility);
-gameRoutes.patch('/abilities/:id', authMiddleware, adminMiddleware, playerController.updateAbility);
-gameRoutes.delete('/abilities', authMiddleware, adminMiddleware, playerController.deleteAllAbilities);
-gameRoutes.delete('/abilities/:id', authMiddleware, adminMiddleware, playerController.deleteAbility);
-gameRoutes.get('/abilities/:id', playerController.getAbilityById);
+gameRoutes.get('/systems', authMiddleware, systemController.listSystems);
+gameRoutes.patch('/system', authMiddleware, systemController.updateSystem);
+gameRoutes.get('/system/network', authMiddleware, systemController.getNetwork);
+gameRoutes.patch('/system/network/:id', authMiddleware, systemController.updateNetwork);
+gameRoutes.get('/system/defense', authMiddleware, systemController.getDefense);
+gameRoutes.patch('/system/defense', authMiddleware, systemController.updateDefense);
+
+gameRoutes.get('/system/assets', authMiddleware, systemController.listAssets);
+gameRoutes.post('/system/assets', authMiddleware, systemController.createAsset);
+gameRoutes.patch('/system/assets/:id', authMiddleware, systemController.updateAsset);
+gameRoutes.delete('/system/assets/:id', authMiddleware, systemController.deleteAsset);
+
+gameRoutes.get('/player/connections', authMiddleware, systemController.listConnections);
+gameRoutes.post('/player/connections', authMiddleware, systemController.createConnection);
+gameRoutes.patch('/player/connections/:id', authMiddleware, systemController.updateConnection);
+gameRoutes.delete('/player/connections/:id', authMiddleware, systemController.deleteConnection);
+
+gameRoutes.get('/mail/inbox', authMiddleware, mailController.inbox);
+gameRoutes.get('/mail/sent', authMiddleware, mailController.sent);
+gameRoutes.post('/mail', authMiddleware, mailController.sendMail);
+gameRoutes.patch('/mail/:id', authMiddleware, mailController.updateSeen);
+gameRoutes.delete('/mail/:id', authMiddleware, mailController.deleteMail);
 
 gameRoutes.post('/actions', authMiddleware, gameController.createAction);
 gameRoutes.get('/actions', gameController.getMoves);

@@ -8,6 +8,27 @@
       "when": 1784557521767,
       "tag": "0000_mixed_mojo",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1786029876533,
+      "tag": "0001_cloudy_jocasta",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1786690974755,
+      "tag": "0002_abandoned_mole_man",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1786768061057,
+      "tag": "0003_windy_typhoid_mary",
+      "breakpoints": true
     }
   ]
 }

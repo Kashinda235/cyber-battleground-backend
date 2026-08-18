@@ -1,9 +1,16 @@
 import { WebSocket, WebSocketServer } from 'ws';
 import type { Server, IncomingMessage } from 'http';
+import {db} from "../db/db.js";
+import {players} from "../db/schema.js";
+import {eq} from "drizzle-orm";
 
 export interface Player {
-    id: string;
-    name: string;
+    id: number;
+    username: string;
+    role: "admin" | "moderator" | "red" | "blue" | "spectator" | "bot";
+    status: "online" | "offline" | "banned";
+    joinedAt: Date;
+    lastSeen: Date;
 }
 // Extend the WebSocket interface to declare custom properties
 export interface CustomWebSocket extends WebSocket {
@@ -36,20 +43,36 @@ export function attachWebSocketServer(server: Server) {
     // Keep track of online players
     const onlinePlayers = new Map<string, Player>();
 
-    wss.on('connection', (socket: CustomWebSocket, req: IncomingMessage) => {
+    wss.on('connection', async (socket: CustomWebSocket, req: IncomingMessage) => {
         socket.isAlive = true;
 
         // Optional: Parse query params if client connects like: ws://localhost:8000/ws?playerId=123&name=Alex
         const urlParams = new URLSearchParams(req.url?.split('?')[1]);
         const playerId = urlParams.get('playerId');
-        const playerName = urlParams.get('name');
+        console.log(onlinePlayers);
 
-        if (playerId && playerName) {
-            const player: Player = { id: playerId, name: playerName };
-            socket.player = player;
-            onlinePlayers.set(playerId, player);
+        if (playerId) {
+            try {
+                const [player] = await db.select().from(players).where(eq(players.id, Number(playerId))).limit(1);
 
-            broadcastPlayerJoined(player);
+                if (!player) {
+                    socket.close(4004, "Player not connected to socket");
+                    return;
+                }
+
+                const [updatedPlayer] = await db.update(players)
+                    .set({ status: 'online' })
+                    .where(eq(players.id, player.id))
+                    .returning();
+
+                socket.player = updatedPlayer ?? player;
+                onlinePlayers.set(playerId, socket.player);
+
+                broadcastPlayerJoined(socket.player);
+            } catch (error) {
+                console.error("Database error during player join:", error);
+                socket.close(4000, "Internal server error");
+            }
         }
 
         socket.on('pong', () => {
@@ -60,15 +83,22 @@ export function attachWebSocketServer(server: Server) {
 
         socket.on('error', console.error);
 
-        socket.on('close', () => {
+        socket.on('close', async () => {
             if (socket.player) {
-                // 1. Remove from active state
-                onlinePlayers.delete(socket.player.id);
+                const playerIdStr = String(socket.player.id);
+                onlinePlayers.delete(playerIdStr);
 
-                // 2. Broadcast to everyone else that this player left!
-                broadcastPlayerLeft(socket.player);
+                try {
+                    await db.update(players)
+                        .set({ status: 'offline' })
+                        .where(eq(players.id, socket.player.id));
 
-                console.log(`[WS] Player left: ${socket.player.name} (${socket.player.id})`);
+                    broadcastPlayerLeft({ ...socket.player, status: 'offline' });
+
+                    console.log(`[WS] Player left & DB updated: ${socket.player.username} (${socket.player.id})`);
+                } catch (error) {
+                    console.error(`[WS] Failed to set player ${socket.player.id} offline in DB:`, error);
+                }
             }
         });
     });
@@ -108,11 +138,21 @@ export function attachWebSocketServer(server: Server) {
         broadcast(wss, { type: 'chat', data: message });
     }
 
+    function broadcastSendMail<T = unknown>(targetId: number, mail: T): void {
+        for (const client of wss.clients) {
+            const ws = client as CustomWebSocket;
+            if (ws.readyState === WebSocket.OPEN && ws.player?.id === Number(targetId)) {
+                sendJson(ws, { type: 'mail', data: mail });
+            }
+        }
+    }
+
     return {
         broadcastPlayerJoined,
         broadcastPlayerLeft,
         broadcastPerformedAction,
         broadcastGameState,
         broadcastMessage,
+        broadcastSendMail,
     };
 }
